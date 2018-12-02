@@ -1,0 +1,54 @@
+version: '3'
+services:
+  panda-db:
+    container_name: panda-db
+    image: 'panda-db'
+    build: 'PandaDb/.'
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - PANDA_DB=pandaDb
+    ports:
+      - '5432:5432'
+    restart: always
+
+  panda-service:
+    container_name: panda-service
+    depends_on:
+      - panda-db
+      - elasticsearch
+      - kibana
+    build: 'Core/Core/.'
+    image: 'panda-service'
+    restart: always
+    ports:
+      - '8080:8080'
+    environment:
+      - PANDA_APPNAME=Panda Service
+      - PANDA_ELASTICSEARCH_LOG_URL=http://elasticsearch:9200
+      - PANDA_POSTGRESQL_HOST=panda-db
+      - PANDA_POSTGRESQL_USERNAME=postgres
+      - PANDA_POSTGRESQL_PASSWORD=123
+      - PANDA_DB_NAME=pandaDb
+
+  # Simple elasticsearch container...probably sufficient for logging
+  # More intense examples: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  elasticsearch:
+    container_name: elasticsearch
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:6.4.3'
+    ports:
+      - '9200:9200'
+    environment:
+      - discovery.type=single-node
+    restart: always
+
+  kibana:
+    container_name: kibana
+    image: nick-kibana
+    build: 'kibana/.'
+    ports:
+      - '5601:5601'
+    depends_on:
+      - elasticsearch
+    restart: always
