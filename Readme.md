@@ -2,7 +2,6 @@
 A starting point for anyone making an asp.net core 2.1 service.
 
 ## Out of the box features
-* MVC
 * Logging to elasticsearch/kibana
 * Exception handling middleware
 * Clean setup for grabbing environment variables
